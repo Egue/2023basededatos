@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { UserService } from './user.service';
 import {FormBuilder , Validators} from '@angular/forms';
 @Component({
@@ -8,15 +8,21 @@ import {FormBuilder , Validators} from '@angular/forms';
 })
 export class UsersComponent {
 
+  @ViewChild("exampleModal") myButton:ElementRef | undefined;
+  public oculto:boolean = true;
+
   public listUser:any[] = [];
 
   public form = this.fb.group({
+    id: '',
     username: '',
     password: '',
     email: '',
     titulo:''
   })
-  public constructor(private userService:UserService, private fb:FormBuilder){}
+  public constructor(
+    private userService:UserService, private fb:FormBuilder,
+    private renderer: Renderer2){}
 
   getListUser()
   {
@@ -28,11 +34,51 @@ export class UsersComponent {
 
   save()
   {
-    this.form.get("titulo")?.setValue("usercrear");
-
-    this.userService.userSave(this.form.value).subscribe(() => {
+    if(this.form.get("id")?.value)
+    {
+      console.log("actualice");
+      this.form.get("titulo")?.setValue("actualizarUser");
+      this.userService.userUpdate(this.form.value).subscribe(()=>{
+        console.log("ya actualizado");
+        
+        this.cerrar();
         this.getListUser();
-        this.form.reset();
+      });
+
+    }else{
+
+      this.form.get("titulo")?.setValue("usercrear");
+      this.userService.userSave(this.form.value).subscribe(() => {
+      this.getListUser();
+      this.form.reset();
     })
+
+    }
+  }
+
+  editar(item:any) 
+  {
+    this.form.reset({...item} , {emitEvent:false, onlySelf:true});
+    this.openModal();
+  }
+
+  openModal()
+  {
+    this.renderer.addClass(this.myButton?.nativeElement , "show");
+    this.renderer.addClass(this.myButton?.nativeElement , "mostrar");
+  }
+
+  cerrar()
+  {
+    this.renderer.removeClass(this.myButton?.nativeElement , "show")
+    this.renderer.removeClass(this.myButton?.nativeElement , "mostrar")
+    this.form.reset();
+  }
+
+  delete(item:any)
+  {
+      this.userService.userDelete(item.id).subscribe(() => {
+        this.getListUser();
+      })
   }
 }

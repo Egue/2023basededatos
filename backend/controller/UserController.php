@@ -55,6 +55,45 @@ require_once("models/UserModels.php");
             http_response_code(400);
         }
      }
+
+     public function update($user)
+     {
+        try{
+
+           $this->user->update($user);
+
+           $response = array("response" => "actualizado");
+
+           http_response_code(200);
+
+           echo json_encode($response);
+
+        }catch(Exception $e)
+        {
+            $response = array("response"=>$e->getMessage());
+            http_response_code(400);
+            echo json_encode($response);
+        }
+     }
+
+     public function delete($id)
+     {
+        try{
+            $this->user->delete($id);
+
+            $response = array("response" => "Eliminado");
+
+            http_response_code(200);
+
+            echo json_encode($response);
+
+        }catch(Exception $e)
+        {
+            $response = array("response"=>$e->getMessage());
+            http_response_code(400);
+            echo json_encode($response);
+        }
+     }
  }
 
 

@@ -17,4 +17,14 @@ export class UserService {
   {
     return this.http.post('http://localhost:8080/index.php' , data);
   }
+
+  userUpdate(user:any)
+  {
+    return this.http.patch('http://localhost:8080/index.php' , user);
+  }
+
+  userDelete(id:any)
+  {
+    return this.http.delete(`http://localhost:8080/index.php?titulo=eliminarUser&id=${id}`);
+  }
 }
